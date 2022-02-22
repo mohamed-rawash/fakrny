@@ -25,7 +25,7 @@ class TaskController {
     getTasks();
   }
 
-  markTaskCompleted(int id, taskDate) async {
+  markTaskCompleted(int id) async {
       await DBHelper.update(id);
     getTasks();
   }

@@ -65,65 +65,71 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.cleaning_services_rounded, color: Colors.red, size: 30,),
             splashRadius: 32.0,
-            onPressed: ()=> Get.defaultDialog(
-              title: "Alert",
-              titleStyle: TextStyle(
-            color: Get.isDarkMode?Colors.white: Colors.black,
-                fontSize: 18
-            ),
-              content: Text(
-                  'Are You Sure To Delete All Tasks!',
-                style: TextStyle(
-                    color: Get.isDarkMode?Colors.white: Colors.black,
-                    fontSize: 18
-                ),
-              ),
-              cancel: ElevatedButton(
-                child: Text(
-                    'Cancel',
-                  style: TextStyle(
-                      color: Get.isDarkMode?Colors.white: Colors.black,
-                      fontSize: 18
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                ),
-                onPressed: () => Get.back(),
-              ),
-              confirm: ElevatedButton(
-                child: Text(
-                  'Confirm',
-                  style: TextStyle(
-                      color: Get.isDarkMode?Colors.white: Colors.black,
-                      fontSize: 18
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Get.isDarkMode? bluishClr: orangeClr,
-                ),
-                onPressed: () {
-                  _taskController.deleteAllTasks();
-                  notifyHelper.cancelAllNotification();
-                  Get.back();
-                  Get.snackbar(
-                    'Confirming',
-                    'Your Tasks Was Deleted Successfully',
-                    duration: const Duration(seconds: 3),
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Get.isDarkMode
-                        ? primaryClr.withOpacity(0.6)
-                        : orangeClr.withOpacity(0.6),
-                    colorText: Get.isDarkMode?Colors.white: Colors.black,
-                    icon: Icon(
-                      Icons.cleaning_services_rounded,
-                      color: Get.isDarkMode?Colors.white: Colors.black,
-                      size: 30,
-                    ),
-                  );
-                },
-              ),
-            ),
+            onPressed: () {
+             if(_taskController.taskList.isNotEmpty) {
+               Get.defaultDialog(
+                 title: "Warning",
+                 titleStyle: TextStyle(
+                     color: Get.isDarkMode?Colors.white: Colors.black,
+                     fontSize: 18
+                 ),
+                 content: Text(
+                   'Are You Sure To Delete All Tasks!',
+                   style: TextStyle(
+                       color: Get.isDarkMode?Colors.white: Colors.black,
+                       fontSize: 18
+                   ),
+                 ),
+                 cancel: ElevatedButton(
+                   child: Text(
+                     'Cancel',
+                     style: TextStyle(
+                         color: Get.isDarkMode?Colors.white: Colors.black,
+                         fontSize: 18
+                     ),
+                   ),
+                   style: ElevatedButton.styleFrom(
+                     primary: Colors.red,
+                   ),
+                   onPressed: () => Get.back(),
+                 ),
+                 confirm: ElevatedButton(
+                   child: Text(
+                     'Confirm',
+                     style: TextStyle(
+                         color: Get.isDarkMode?Colors.white: Colors.black,
+                         fontSize: 18
+                     ),
+                   ),
+                   style: ElevatedButton.styleFrom(
+                     primary: Get.isDarkMode? bluishClr: orangeClr,
+                   ),
+                   onPressed: () {
+                     _taskController.deleteAllTasks();
+                     notifyHelper.cancelAllNotification();
+                     Get.back();
+                     Get.snackbar(
+                       'Confirming',
+                       'Your Tasks Was Deleted Successfully',
+                       duration: const Duration(seconds: 3),
+                       snackPosition: SnackPosition.BOTTOM,
+                       backgroundColor: Get.isDarkMode
+                           ? primaryClr.withOpacity(0.6)
+                           : orangeClr.withOpacity(0.6),
+                       colorText: Get.isDarkMode?Colors.white: Colors.black,
+                       icon: Icon(
+                         Icons.cleaning_services_rounded,
+                         color: Get.isDarkMode?Colors.white: Colors.black,
+                         size: 30,
+                       ),
+                     );
+                   },
+                 ),
+               );
+             }else {
+               _showSnackBar(title: 'Warning', message: 'You Don\'t Have Any Tasks Yet!', position: SnackPosition.TOP);
+             }
+            },
           ),
           const CircleAvatar(
             backgroundImage: AssetImage('assets/images/person.jpeg'),
@@ -281,7 +287,59 @@ class _HomePageState extends State<HomePage> {
                       horizontalOffset: 300,
                       child: FadeInAnimation(
                         child: GestureDetector(
-                          child: TaskTile(task: task),
+                          child: Dismissible(
+                            key: UniqueKey(),
+                            child: TaskTile(task: task),
+                            background: Container(
+                              color: Get.isDarkMode?bluishClr.withOpacity(0.6) :orangeClr.withOpacity(0.6),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(width: 5,),
+                                  Icon(Icons.check_circle, color: Get.isDarkMode?white:black, size: 30,),
+                                  const SizedBox(width: 5,),
+                                  Text(
+                                    'Complete',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: Get.isDarkMode?white:black
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            secondaryBackground: Container(
+                              color: Colors.red,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(width: 5,),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        color: Get.isDarkMode?white:black
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5,),
+                                  Icon(Icons.delete_rounded, color: Get.isDarkMode?white:black, size: 30,),
+                                ],
+                              ),
+                            ),
+                            onDismissed: (direction){
+                              if(direction == DismissDirection.startToEnd) {
+                                _taskController.markTaskCompleted(task.id!);
+                                _showSnackBar(title: "Confirming", message: "You Mark The ${task.title} Task As Complete", position: SnackPosition.BOTTOM);
+                              }else {
+                                _taskController.deleteTasks(task);
+                                _showSnackBar(title: "Confirming", message: "You Delete The ${task.title} Task Successfully", position: SnackPosition.BOTTOM);
+                              }
+                            },
+                          ),
                           onTap: () => showBottomSheet(
                             context: context,
                             task: task,
@@ -300,6 +358,24 @@ class _HomePageState extends State<HomePage> {
               message:
                   'You do not have any tasks yet!\nAdd new tasks to make your day easly,\nAnd do not miss any date.'),
         ),
+      ),
+    );
+  }
+
+  _showSnackBar({required String title, required String message, required SnackPosition position}) {
+    return Get.snackbar(
+      title,
+      message,
+      duration: const Duration(seconds: 2),
+      snackPosition: position,
+      backgroundColor: Get.isDarkMode
+          ? bluishClr.withOpacity(0.5)
+          : orangeClr.withOpacity(0.5),
+      colorText: Colors.black,
+      icon: const Icon(
+        Icons.warning_rounded,
+        color: white,
+        size: 24,
       ),
     );
   }
@@ -364,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               // FlutterLocalNotificationsPlugin.cancel(task.id);
                               _taskController.markTaskCompleted(
-                                  task.id!, task.date!);
+                                  task.id!);
                               Get.back();
                             },
                             color: primaryClr.withOpacity(0.6),

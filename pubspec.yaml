@@ -57,11 +57,11 @@ flutter_icons:
 
 flutter_native_splash:
   color: "#78a2d2"
-  image_path: assets/images/app_icon.png
+  image: assets/images/splach_icon.png
   android: true
   ios: true
   web: true
-  android_gravity: center
+  android_gravity: fill
 
 flutter:
   uses-material-design: true
