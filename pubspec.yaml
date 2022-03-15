@@ -56,12 +56,12 @@ flutter_icons:
   image_path: "assets/images/app_icon.png"
 
 flutter_native_splash:
-  color: "#78a2d2"
-  image: assets/images/splach_icon.png
+  color: "#173f5f"
+  image: assets/images/taking-notes.png
   android: true
   ios: true
   web: true
-  android_gravity: fill
+  android_gravity: center
 
 flutter:
   uses-material-design: true

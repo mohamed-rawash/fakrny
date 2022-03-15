@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           const CircleAvatar(
-            backgroundImage: AssetImage('assets/images/person.jpeg'),
+            backgroundImage: AssetImage('assets/images/app_icon.png'),
             radius: 15,
           ),
           const SizedBox(width: 8),
@@ -255,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                   : Axis.vertical,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
-              itemCount: _isEmpty ? 1 : _taskController.taskList.length,
+              itemCount:_taskController.taskList.length,
               separatorBuilder: (context, index) => const SizedBox(height: 6),
               itemBuilder: (context, index) {
                 Task task = _taskController.taskList[index];
@@ -297,14 +297,21 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   const SizedBox(width: 5,),
-                                  Icon(Icons.check_circle, color: Get.isDarkMode?white:black, size: 30,),
+                                  task.isCompleted == 1?Icon(Icons.check_box, color: Get.isDarkMode?white:black, size: 30,):Icon(Icons.check_box_outline_blank, color: Get.isDarkMode?white:black, size: 30,),
                                   const SizedBox(width: 5,),
-                                  Text(
-                                    'Complete',
+                                  task.isCompleted != 1? Text(
+                                    'Make Complete',
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w800,
                                       color: Get.isDarkMode?white:black
+                                    ),
+                                  ): Text(
+                                    'Completed',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        color: Get.isDarkMode?white:black
                                     ),
                                   ),
                                 ],
@@ -332,8 +339,13 @@ class _HomePageState extends State<HomePage> {
                             ),
                             onDismissed: (direction){
                               if(direction == DismissDirection.startToEnd) {
-                                _taskController.markTaskCompleted(task.id!);
-                                _showSnackBar(title: "Confirming", message: "You Mark The ${task.title} Task As Complete", position: SnackPosition.BOTTOM);
+                                if(task.isCompleted == 0){
+                                  _taskController.markTaskCompleted(task.id!);
+                                  _showSnackBar(title: "Confirming", message: "You Mark The ${task.title} Task As Complete", position: SnackPosition.BOTTOM);
+                                }else {
+                                  _taskController.markTaskCompleted(task.id!);
+                                  _showSnackBar(title: "Warning", message: "The ${task.title} Task Is Already Completed", position: SnackPosition.BOTTOM);
+                                }
                               }else {
                                 _taskController.deleteTasks(task);
                                 _showSnackBar(title: "Confirming", message: "You Delete The ${task.title} Task Successfully", position: SnackPosition.BOTTOM);
